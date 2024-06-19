@@ -12,11 +12,13 @@
   "description": "",
   "type": "module",
   "dependencies": {
+    "@prisma/client": "^5.15.1",
     "fastify": "^4.28.0"
   },
   "devDependencies": {
     "@rocketseat/eslint-config": "^2.2.2",
     "eslint": "^8.57.0",
+    "prisma": "^5.15.1",
     "tsx": "^4.15.6",
     "typescript": "^5.4.5"
   }
