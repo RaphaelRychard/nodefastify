@@ -10,18 +10,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  uuid    String  @id @default(uuid())
-  email String  @unique
-  name  String?
-  posts Post[]
-}
-
-model Post {
-  uuid        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean @default(false)
-  author    User    @relation(fields: [authorId], references: [uuid])
-  authorId  String
+model transactionClinte {
+  uuid   String  @id @default(uuid())
+  title  String
+  amount Decimal
+  type   String
 }

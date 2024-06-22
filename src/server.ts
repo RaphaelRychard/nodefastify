@@ -1,17 +1,16 @@
 import fastify from 'fastify'
-import { prismaClient } from './database/prismaClient'
+import { env } from './env'
+import { transactionsRoutes } from './routes/transactions'
 
 const app = fastify()
 
-app.get('/hello', async () => {
-  const createUser = await prismaClient.user.findMany()
-
-  return createUser
+app.register(transactionsRoutes, {
+  prefix: 'transactions',
 })
 
 app
   .listen({
-    port: 3333,
+    port: env.PORT,
   })
   .then(() => {
     console.log('HTTP Server Running')
