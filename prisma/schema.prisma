@@ -11,8 +11,10 @@ datasource db {
 }
 
 model transactionClinte {
-  uuid   String  @id @default(uuid())
-  title  String
-  amount Decimal
-  type   String
+  uuid       String  @id @default(uuid())
+  title      String
+  amount     Decimal
+  created_at String
+  sessoin_id String?
+  type       String
 }
