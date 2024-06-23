@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "lint": "eslint src --ext .ts --fix",
+    "build": "tsup src",
     "test": "vitest"
   },
   "keywords": [],
@@ -26,6 +27,7 @@
     "eslint": "^8.57.0",
     "prisma": "^5.15.1",
     "supertest": "^7.0.0",
+    "tsup": "^8.1.0",
     "tsx": "^4.15.6",
     "typescript": "^5.4.5",
     "vitest": "^1.6.0"
