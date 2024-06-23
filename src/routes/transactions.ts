@@ -2,39 +2,89 @@ import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 import { prismaClient } from '../database/prismaClient'
 import { randomUUID } from 'crypto'
+import { checkSessionIdExists } from '../middlewares/check-session-id-exists'
+
+// Unitários: unidade da sua aplicação
+// Integração: cominicação entre duas ou mais unidades
+// e2e - ponta a ponta: simulam um usuário operando na nossa aplicação
+
+// front-end: abre a página de login, digite o texto diego@rockecetseat.com.br no campo com ID email, clique no botão
+// back-end: chamadas HTTP, WebSckets
+
+// Pirâmentes de testes: E2E (não dependem de nunhuma tecnologia, não dependerm de arquitetura)
+// 2000 testes -> Teste E2E => 65min
 
 export async function transactionsRoutes(app: FastifyInstance) {
-  app.get('/', async () => {
-    const transactions = await prismaClient.transactionClinte.findMany()
+  // isso faz com que execulte tudo nesse contexto sem afetar outros
+  // app.addHook('preHandler', async (request, replay) => {
+  //   console.log(`${request.method} ${request.url}`)
+  // })
 
-    return { transactions }
-  })
+  app.get(
+    '/',
+    {
+      preHandler: [checkSessionIdExists],
+    },
+    async (request) => {
+      const { sessionId } = request.cookies
 
-  app.get('/:uuid', async (request) => {
-    const getTransactionParamsSchema = z.object({
-      uuid: z.string().uuid(),
-    })
+      const transactions = await prismaClient.transactionClinte.findMany({
+        where: {
+          sessoin_id: sessionId,
+        },
+      })
 
-    const { uuid } = getTransactionParamsSchema.parse(request.params)
+      return { transactions }
+    },
+  )
 
-    const transaction = await prismaClient.transactionClinte.findUnique({
-      where: { uuid },
-    })
+  app.get(
+    '/:uuid',
+    {
+      preHandler: [checkSessionIdExists],
+    },
+    async (request) => {
+      const getTransactionParamsSchema = z.object({
+        uuid: z.string().uuid(),
+      })
 
-    return { transaction }
-  })
+      const { uuid } = getTransactionParamsSchema.parse(request.params)
 
-  app.get('/summary', async () => {
-    const summaryResult = await prismaClient.transactionClinte.aggregate({
-      _sum: {
-        amount: true,
-      },
-    })
+      const { sessionId } = request.cookies
 
-    const summary = { amount: summaryResult._sum.amount }
+      const transaction = await prismaClient.transactionClinte.findUnique({
+        where: {
+          uuid,
+          sessoin_id: sessionId,
+        },
+      })
 
-    return { summary }
-  })
+      return { transaction }
+    },
+  )
+
+  app.get(
+    '/summary',
+    {
+      preHandler: [checkSessionIdExists],
+    },
+    async (request) => {
+      const { sessionId } = request.cookies
+
+      const summaryResult = await prismaClient.transactionClinte.aggregate({
+        where: {
+          sessoin_id: sessionId,
+        },
+        _sum: {
+          amount: true,
+        },
+      })
+
+      const summary = { amount: summaryResult._sum.amount }
+
+      return { summary }
+    },
+  )
 
   app.post('/', async (request, replay) => {
     const createTransactionBodySchema = z.object({
